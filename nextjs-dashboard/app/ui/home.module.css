@@ -5,3 +5,29 @@
   border-left: 20px solid transparent;
   border-right: 20px solid transparent;
 }
+
+/* 
+CSS modules provide a way to make CSS classes locally scoped to components by default, reducing the risk of styling conflicts.
+to conditionally style elements based on state or another condition:clsx library 
+
+clsx: 
+Suppose that you want to create an InvoiceStatus component which accepts status. The status can be 'pending' or 'paid'.
+If it's 'paid', you want the color to be green. If it's 'pending', you want the color to be gray.
+You can use clsx to conditionally apply the classes, like this:
+
+import clsx from 'clsx';
+ 
+export default function InvoiceStatus({ status }: { status: string }) {
+  return (
+    <span
+      className={clsx(
+        'inline-flex items-center rounded-full px-2 py-1 text-sm',
+        {
+          'bg-gray-100 text-gray-500': status === 'pending',
+          'bg-green-500 text-white': status === 'paid',
+        },
+      )}
+    >
+    // ...
+)}
+*/
