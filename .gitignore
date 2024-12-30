@@ -1,13 +1,4 @@
 
-To add files and directories to your .gitignore file, you just need to list them in the file so Git knows to ignore them when you commit changes. Here’s how to add the commonly ignored files related to deploying a Next.js project:
-
-Create a .gitignore file (if you don't have one already): In the root directory of your project, create a file named .gitignore.
-
-Add files and directories to the .gitignore file: You can add the following lines to .gitignore to ensure that unwanted files (like build artifacts and dependency directories) are ignored:
-
-Common .gitignore Entries for Next.js:
-bash
-Copy code
 # Dependency directories
 node_modules/
 
