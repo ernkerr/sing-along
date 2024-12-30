@@ -14,5 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+// root layouts are required
+// they share UI across multiple pages
 // one benefit of using layouts on Next.js is partial rendering:
 // only the page components update while the layout won't re-render
