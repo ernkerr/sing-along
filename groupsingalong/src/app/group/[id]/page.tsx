@@ -29,9 +29,15 @@ export default function GroupPage() {
 
   useEffect(() => {
     // initialize pusher
+    console.log("pusher key", process.env.NEXT_PUBLIC_PUSHER_KEY);
+    console.log("cluster", process.env.NEXT_PUBLIC_PUSHER_CLUSTER);
+    //
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
     });
+    //
+    console.log("pusher key", process.env.NEXT_PUBLIC_PUSHER_KEY);
+    console.log("cluster", process.env.NEXT_PUBLIC_PUSHER_CLUSTER);
 
     // subscribe to a channel for the group
     const channel = pusher.subscribe("group-lyrics");
@@ -108,6 +114,7 @@ export default function GroupPage() {
 
       if (data.lyrics) {
         setLyrics(data.lyrics); // Update local lyrics state
+        console.log("lyrics have been set for: ", title);
 
         // Broadcast lyrics to all group members via Pusher
         const pusherResponse = await fetch("/api/pusher", {
@@ -121,7 +128,15 @@ export default function GroupPage() {
             data: { lyrics: data.lyrics },
           }),
         });
+
+        console.log("Pusher request body:", {
+          channel: `group-lyrics-${id}`,
+          event: "lyrics-update",
+          data: { lyrics: data.lyrics },
+        });
+
         if (!pusherResponse.ok) {
+          console.error("Pusher response error:", await pusherResponse.text());
           alert("Failed to broadcast lyrics!");
         }
       } else {
@@ -138,6 +153,17 @@ export default function GroupPage() {
       {isConductor ? (
         <>
           {/* search input */}
+          {/* <div className="search">
+            <input
+              type="text"
+              name="song"
+              className="search-song"
+              //   autofocus="autofocus"
+              placeholder="Pick a song"
+              id="search-input"
+            />
+            <ul className="results" id="results"></ul>
+          </div> */}
           <input
             type="text"
             value={searchTerm}

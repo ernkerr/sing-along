@@ -6,6 +6,14 @@
 import Pusher from "pusher";
 import { NextApiRequest, NextApiResponse } from "next";
 
+console.log("PUSHER_APP_ID:", process.env.PUSHER_APP_ID);
+console.log("NEXT_PUBLIC_PUSHER_KEY:", process.env.NEXT_PUBLIC_PUSHER_KEY);
+console.log("PUSHER_SECRET:", process.env.PUSHER_SECRET);
+console.log(
+  "NEXT_PUBLIC_PUSHER_CLUSTER:",
+  process.env.NEXT_PUBLIC_PUSHER_CLUSTER
+);
+
 // initialze pusher with credentials
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID as string,
