@@ -16,12 +16,15 @@ export default function LandingPage() {
   const createGroup = () => {
     const groupId = generateRandomString();
     router.push(`/group/${groupId}`);
+    localStorage.setItem("isCreator", groupId); // Mark this user as the creator
   };
 
   // function for users to join a group
-  const joinGroup = (e) => {
+  const joinGroup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevents reload of page.. I think?
-    const groupId = e.target.element.code.value.trim();
+    const groupId = (
+      e.currentTarget.elements.namedItem("code") as HTMLInputElement
+    ).value.trim();
     console.log("groupId entered: ", groupId);
     if (groupId) {
       router.push(`/group/${groupId}`);
