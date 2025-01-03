@@ -16,7 +16,8 @@ export default function LandingPage() {
   const createGroup = () => {
     const groupId = generateRandomString();
     router.push(`/group/${groupId}`);
-    localStorage.setItem("isCreator", groupId); // Mark this user as the creator
+    // localStorage.setItem("isCreator", groupId); // Mark this user as the creator
+    localStorage.setItem("isConductor", "true"); // Mark this user as the conductor
   };
 
   // function for users to join a group

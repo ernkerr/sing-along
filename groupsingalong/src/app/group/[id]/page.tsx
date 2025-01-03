@@ -6,20 +6,24 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Pusher from "pusher-js";
 
+// Define the structure of the search result based on the new data
+interface SearchResult {
+  display: string;
+  artist: string;
+  title: string;
+}
+
 export default function GroupPage() {
   const { id } = useParams() as { id: string }; // retrieve the group ID from the URL
   const [isConductor, setIsConductor] = useState(false); // determine if the user is the coductor/creator or if they are a singer
   const [lyrics, setLyrics] = useState(""); // state to hold the current lyrics
   const [searchTerm, setSearchTerm] = useState(""); // state for song name search
-  const [artist, setArtist] = useState(""); // state for artist name search
-
-  //   useEffect(() => {
-  //     //identify if the user is the Conductor (via localStorage or query param)
-  //     setIsConductor(localStorage.getItem("isConductor") === id);
-  //   }, [id]);
+  // const [searchResults, setSearchResults] = useState([]); // store search results from Deezer
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]); // Store search results with correct type
 
   // identify if the user is the conductor
   useEffect(() => {
+    // check if the user is marked as the conductor in local storage
     setIsConductor(localStorage.getItem("isConductor") === "true");
   }, []);
 
@@ -42,21 +46,71 @@ export default function GroupPage() {
       channel.unbind_all();
       channel.unsubscribe();
     };
-  }, []);
+  }, [id]);
 
-  const searchLyrics = async () => {
+  // Search for songs using Deezer API
+  //   const searchSong = async () => {
+  //     try {
+  //       console.log("Searching for song:", searchTerm);
+  //       const response = await fetch(
+  //         `https://api.deezer.com/search?q=${encodeURIComponent(searchTerm)}`
+  //       );
+  //       const result = await response.json();
+  //       console.log("Deezer API response:", result); // Log Deezer response
+
+  //       if (result.data) {
+  //         // map the results to match the desired structure
+  //         const formattedResults = result.data.map((item) => {
+  //           console.log("Mapping item:", item); // Log each item being mapped
+  //           return {
+  //             display: `${item.title} - ${item.artist.name}`,
+  //             artist: item.artist.name,
+  //             title: item.title,
+  //           };
+  //         });
+  //         setSearchResults(formattedResults); // set search results
+  //       } else {
+  //         setSearchResults([]);
+  //         alert("No results found");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error searching songs: ", error);
+  //     }
+  //   };
+
+  // maybe ngrok
+
+  const searchSong = async () => {
+    // Hardcoded search result
+    const hardcodedResult = [
+      {
+        display: "Hello - Adele",
+        artist: "Adele",
+        title: "Hello",
+      },
+    ];
+
+    // Set the hardcoded search results
+    setSearchResults(hardcodedResult);
+
+    console.log("Hardcoded search results:", hardcodedResult);
+  };
+
+  // Fetch lyrics using Lyrics.ovh API
+  const fetchLyrics = async (title: string, artist: string) => {
     try {
-      console.log("trying to query lyrics from db");
       const response = await fetch(
-        `/api/lyrics?query=${searchTerm}&srtist=${artist}`
+        `https://api.lyrics.ovh/v1/${encodeURIComponent(
+          artist
+        )}/${encodeURIComponent(title)}`
       );
       const data = await response.json();
 
       if (data.lyrics) {
-        setLyrics(data.lyrics); // update local lyrics
+        setLyrics(data.lyrics); // Update local lyrics state
 
-        // broadcast lyrics to all group members via pusher
-        const response = await fetch("/api/pusher", {
+        // Broadcast lyrics to all group members via Pusher
+        const pusherResponse = await fetch("/api/pusher", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -67,14 +121,14 @@ export default function GroupPage() {
             data: { lyrics: data.lyrics },
           }),
         });
-        if (!response.ok) {
+        if (!pusherResponse.ok) {
           alert("Failed to broadcast lyrics!");
         }
       } else {
         alert("No lyrics found");
       }
     } catch (error) {
-      console.error("Error searching lyrics: ", error);
+      console.error("Error fetching lyrics: ", error);
     }
   };
 
@@ -83,31 +137,43 @@ export default function GroupPage() {
       <h1>Group Code: {id}</h1>
       {isConductor ? (
         <>
+          {/* search input */}
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Enter song name"
+            placeholder="Search for a song"
           />
-          <input
-            type="text"
-            value={artist}
-            onChange={(e) => setArtist(e.target.value)}
-            placeholder="Enter artist name (optional)"
-          />
-          <button onClick={searchLyrics}>Search</button>
+          <button onClick={searchSong}>Search</button>
+          {/* display the search results  */}
+          {searchResults.length > 0 && (
+            <>
+              <ul>
+                {searchResults.map((result, index) => (
+                  <li
+                    key={index}
+                    onClick={() => fetchLyrics(result.title, result.artist)}
+                  >
+                    {result.display}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
           <div>
             <h2>Lyrics:</h2>
             <p>{lyrics}</p>
+            <pre>{lyrics || "No lyrics available yet."}</pre>
           </div>
         </>
       ) : (
         <p>Waiting for the conductor to select a song...</p>
       )}
-      <>
+      {/* <>
         <h2>Lyrics:</h2>
         <pre>{lyrics || "No lyrics avaliable yet."}</pre>
-      </>
+      </> */}
     </>
   );
 }
