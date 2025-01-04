@@ -34,10 +34,16 @@ export default async function handler(
       await pusher.trigger(channel, event, data);
       res.status(200).send("Event triggered successfully!");
     } catch (error) {
-      console.error("Error triggering Pusher event:", error);
-      res.status(500).send("Error triggering event.");
+      const typedError = error as Error;
+      console.error("Error details:", {
+        message: typedError.message,
+        stack: typedError.stack,
+      });
+      res.status(500).json({ error: "Failed to trigger event" });
     }
   } else {
     res.status(405).send("Method not allowed.");
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 }

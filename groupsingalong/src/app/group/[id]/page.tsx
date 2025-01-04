@@ -29,16 +29,10 @@ export default function GroupPage() {
 
   useEffect(() => {
     // initialize pusher
-    console.log("pusher key", process.env.NEXT_PUBLIC_PUSHER_KEY);
-    console.log("cluster", process.env.NEXT_PUBLIC_PUSHER_CLUSTER);
-    //
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
     });
     //
-    console.log("pusher key", process.env.NEXT_PUBLIC_PUSHER_KEY);
-    console.log("cluster", process.env.NEXT_PUBLIC_PUSHER_CLUSTER);
-
     // subscribe to a channel for the group
     const channel = pusher.subscribe("group-lyrics");
 
@@ -189,7 +183,7 @@ export default function GroupPage() {
 
           <div>
             <h2>Lyrics:</h2>
-            <p>{lyrics}</p>
+            {/* <p>{lyrics}</p> */}
             <pre>{lyrics || "No lyrics available yet."}</pre>
           </div>
         </>
